@@ -1,0 +1,59 @@
+{
+  "expo": {
+    "name": "Trip Buddy",
+    "slug": "trip-buddy",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "light",
+    "splash": {
+      "resizeMode": "contain",
+      "backgroundColor": "#1E3A5F"
+    },
+    "assetBundlePatterns": [
+      "**/*"
+    ],
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.tripbuddy.app",
+      "infoPlist": {
+        "NSLocationWhenInUseUsageDescription": "Trip Buddy needs your location to show nearby destinations.",
+        "NSCameraUsageDescription": "Trip Buddy needs camera access to set your profile photo.",
+        "NSPhotoLibraryUsageDescription": "Trip Buddy needs photo library access to set your profile photo."
+      }
+    },
+    "android": {
+      "adaptiveIcon": {
+        "backgroundColor": "#1E3A5F"
+      },
+      "package": "com.tripbuddy.app",
+      "permissions": [
+        "ACCESS_FINE_LOCATION",
+        "ACCESS_COARSE_LOCATION",
+        "CAMERA",
+        "READ_EXTERNAL_STORAGE",
+        "WRITE_EXTERNAL_STORAGE"
+      ]
+    },
+    "web": {
+      "favicon": "./assets/favicon.png"
+    },
+    "plugins": [
+      "expo-secure-store",
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "Trip Buddy needs access to your photos."
+        }
+      ],
+      [
+        "expo-location",
+        {
+          "locationWhenInUsePermission": "Trip Buddy needs your location."
+        }
+      ],
+      "expo-font"
+    ],
+    "scheme": "tripbuddy"
+  }
+}

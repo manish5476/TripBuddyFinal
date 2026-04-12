@@ -1,0 +1,168 @@
+// src/constants/index.js
+
+export * from './theme';
+
+// ── API Config ──────────────────────────────────
+// Change BASE_URL to match your backend:
+//   Android Emulator : http://10.0.2.2:5000/api
+//   iOS Simulator    : http://localhost:5000/api
+//   Physical Device  : http://<YOUR_PC_IP>:5000/api
+//   Production       : https://yourdomain.com/api
+
+export const API_CONFIG = {
+  BASE_URL:   process.env.EXPO_PUBLIC_API_URL || 'http://localhost:5000/api/v1',
+  SOCKET_URL: process.env.EXPO_PUBLIC_SOCKET_URL || 'http://localhost:5000',
+  TIMEOUT:    10000,
+};
+
+// ── API Endpoints ───────────────────────────────
+export const ENDPOINTS = {
+  AUTH: {
+    REGISTER:        '/auth/register',
+    LOGIN:           '/auth/login',
+    LOGOUT:          '/auth/logout',
+    ME:              '/auth/me',
+    UPDATE_PROFILE:  '/auth/update-profile',
+    UPDATE_PASSWORD: '/auth/update-password',
+    AVATAR:          '/auth/avatar',
+    COVER:           '/auth/cover',
+    PRIVACY:         '/auth/privacy',
+    NOTIFICATIONS:   '/auth/notifications',
+    ACCOUNT:         '/auth/account',
+  },
+  USERS: {
+    SEARCH:          '/users/search',
+    PROFILE:         (username) => `/users/${username}`,
+    FOLLOW:          (userId) => `/users/${userId}/follow`,
+    FOLLOWERS:       (userId) => `/users/${userId}/followers`,
+    FOLLOWING:       (userId) => `/users/${userId}/following`,
+    BLOCK:           (userId) => `/users/${userId}/block`,
+  },
+  JOURNEYS: {
+    ALL:             '/journeys',
+    MY:              '/journeys/my',
+    DETAIL:          (id) => `/journeys/${id}`,
+    END:             (id) => `/journeys/${id}/end`,
+    GHOST:           (id) => `/journeys/${id}/ghost`,
+    LOCATION:        (id) => `/journeys/${id}/location`,
+    SEGMENTS:        (id) => `/journeys/${id}/segments`,
+    CO_TRAVELLERS:   (id) => `/journeys/${id}/co-travellers`,
+    REMOVE_CO_TRAVELLER:(id, userId) => `/journeys/${id}/co-travellers/${userId}`,
+    WRAP_CARD:       (id) => `/journeys/${id}/wrap`,
+    AI_NARRATIVE:    (id) => `/journeys/${id}/narrative`,
+  },
+  STOPS: {
+    SYNC:            '/stops/offline-sync',
+    CREATE:          '/stops',
+    BY_JOURNEY:      (journeyId) => `/stops/journey/${journeyId}`,
+    DETAIL:          (id) => `/stops/${id}`,
+    REACT:           (id) => `/stops/${id}/react`,
+    COMMENTS:        (id) => `/stops/${id}/comments`,
+    DELETE_COMMENT:  (stopId, commentId) => `/stops/${stopId}/comments/${commentId}`,
+    SAVE:            (id) => `/stops/${id}/save`,
+    BEEN_HERE:       (id) => `/stops/${id}/been-here`,
+  },
+  REELS: {
+    FEED:            '/reels/feed',
+    EXPLORE:         '/reels/explore',
+    CREATE:          '/reels',
+    BY_USER:         (userId) => `/reels/user/${userId}`,
+    DETAIL:          (id) => `/reels/${id}`,
+    LIKE:            (id) => `/reels/${id}/like`,
+    REACT:           (id) => `/reels/${id}/react`,
+    COMMENT:         (id) => `/reels/${id}/comment`,
+    SAVE:            (id) => `/reels/${id}/save`,
+  },
+  CHANNELS: {
+    MY:              '/channels',
+    DM:              '/channels/dm',
+    GROUP:           '/channels/group',
+    DETAIL:          (id) => `/channels/${id}`,
+    IMAGE:           (id) => `/channels/${id}/image`,
+    MEMBERS:         (id) => `/channels/${id}/members`,
+    REMOVE_MEMBER:   (id, userId) => `/channels/${id}/members/${userId}`,
+    LEAVE:           (id) => `/channels/${id}/leave`,
+    MUTE:            (id) => `/channels/${id}/mute`,
+    READ:            (id) => `/channels/${id}/read`,
+  },
+  MESSAGES: {
+    CHANNEL:         (channelId) => `/messages/${channelId}`,
+    MEDIA:           (channelId) => `/messages/${channelId}/media`,
+    VOICE:           (channelId) => `/messages/${channelId}/voice`,
+    POLL:            (channelId) => `/messages/${channelId}/poll`,
+    DETAIL:          (messageId) => `/messages/${messageId}`,
+    REACT:           (messageId) => `/messages/${messageId}/react`,
+    VOTE:            (messageId) => `/messages/${messageId}/vote`,
+  },
+  TRAVEL_GROUPS: {
+    MY:              '/travel-groups',
+    CREATE:          '/travel-groups',
+    DETAIL:          (id) => `/travel-groups/${id}`,
+    JOIN:            (id) => `/travel-groups/${id}/join`,
+    LEAVE:           (id) => `/travel-groups/${id}/leave`,
+    KICK:            (id, userId) => `/travel-groups/${id}/members/${userId}`,
+    INVITE:          (id) => `/travel-groups/${id}/invite`,
+    JOIN_INVITE:     '/travel-groups/join-by-invite',
+    EXPENSES:        (id) => `/travel-groups/${id}/expenses`,
+    LINK_JOURNEY:    (id) => `/travel-groups/${id}/link-journey`,
+  },
+  COMPANIONS: {
+    REQUEST:         '/companions/request',
+    RESPOND:         (id) => `/companions/request/${id}/respond`,
+    PENDING:         '/companions/pending',
+    MY:              '/companions',
+    NEARBY:          '/companions/nearby',
+    REMOVE:          (companionId) => `/companions/${companionId}`,
+    GROUPS:          '/companions/groups',
+    GROUP_DETAIL:    (id) => `/companions/groups/${id}`,
+  },
+  SAFETY: {
+    SOS_TRIGGER:     '/safety/sos/trigger',
+    SOS_LOCATION:    (id) => `/safety/sos/${id}/location`,
+    SOS_RESPOND:     (id) => `/safety/sos/${id}/respond`,
+    SOS_RESOLVE:     (id) => `/safety/sos/${id}/resolve`,
+    COMPASS_LOCATION:(id) => `/safety/compass/${id}/location`,
+    COMPASS_END:     (id) => `/safety/compass/${id}/end`,
+    CHECKIN:         '/safety/checkin',
+    CHECKIN_TIMER:   '/safety/checkin-timer',
+    TRUSTED:         '/safety/trusted-contacts',
+    REMOVE_TRUSTED:  (userId) => `/safety/trusted-contacts/${userId}`,
+    BLACKOUT_ZONES:  '/safety/blackout-zones',
+    REMOVE_BLACKOUT: (zoneId) => `/safety/blackout-zones/${zoneId}`,
+  },
+  EXPLORE: {
+    FEED:            '/explore/feed',
+    LIVE_GLOBE:      '/explore/live-globe',
+    NEARBY_STOPS:    '/explore/nearby-stops',
+    TRENDING:        '/explore/trending-hashtags',
+  },
+  NOTIFICATIONS: {
+    ALL:             '/notifications',
+    UNREAD_COUNT:    '/notifications/unread-count',
+    READ:            '/notifications/read',
+    DELETE:          (id) => `/notifications/${id}`,
+  },
+  EXPENSES: {
+    CREATE:          '/expenses',
+    GROUP:           (groupId) => `/expenses/group/${groupId}`,
+    SETTLE:          (id) => `/expenses/${id}/settle`,
+    DELETE:          (id) => `/expenses/${id}`,
+  },
+  TEMPLATES: {
+    ALL:             '/templates',
+    CREATE:          '/templates',
+    DETAIL:          (id) => `/templates/${id}`,
+    PUBLISH:         (id) => `/templates/${id}/publish`,
+    PURCHASE:        (id) => `/templates/${id}/purchase`,
+    RATE:            (id) => `/templates/${id}/rate`,
+  },
+  UPLOADS: {
+    IMAGE:           '/uploads/image',
+    IMAGES:          '/uploads/images',
+    VIDEO:           '/uploads/video',
+    AUDIO:           '/uploads/audio',
+    DOCUMENT:        '/uploads/document',
+    DELETE:          '/uploads',
+    SIGNATURE:       '/uploads/signature',
+  },
+};
