@@ -9,6 +9,7 @@ import Toast from 'react-native-toast-message';
 
 import { AuthProvider, useAuth } from './src/context/AuthContext';
 import { AuthNavigator, AppNavigator } from './src/navigation/AppNavigator';
+import OnboardingScreen from './src/screens/Auth/OnboardingScreen';
 import { COLORS } from './src/constants';
 
 const RootNavigator = () => {
@@ -18,7 +19,9 @@ const RootNavigator = () => {
       <ActivityIndicator size="large" color={COLORS.white} />
     </View>
   );
-  return user ? <AppNavigator /> : <AuthNavigator />;
+  if (!user) return <AuthNavigator />;
+  if (user.requiresOnboarding || user.requiresAgeVerification) return <OnboardingScreen />;
+  return <AppNavigator />;
 };
 
 export default function App() {

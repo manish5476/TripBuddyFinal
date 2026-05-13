@@ -6,6 +6,7 @@ export const journeyService = {
   createJourney: (data) => baseService.post(ENDPOINTS.JOURNEYS.ALL, data),
   getMyJourneys: (params) => baseService.get(ENDPOINTS.JOURNEYS.MY, { params }),
   getJourney: (id) => baseService.get(ENDPOINTS.JOURNEYS.DETAIL(id)),
+  getJourneyMap: (id) => baseService.get(ENDPOINTS.JOURNEYS.MAP(id)),
   updateJourney: (id, data) => baseService.put(ENDPOINTS.JOURNEYS.DETAIL(id), data),
   deleteJourney: (id) => baseService.delete(ENDPOINTS.JOURNEYS.DETAIL(id)),
   

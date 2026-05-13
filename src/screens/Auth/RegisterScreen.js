@@ -13,11 +13,18 @@ export default function RegisterScreen({ navigation }) {
   const [email, setEmail]       = useState('');
   const [password, setPassword] = useState('');
   const [phoneNumber, setPhoneNumber] = useState('');
+  const [dateOfBirth, setDateOfBirth] = useState('');
+  const [travelPersonality, setTravelPersonality] = useState('adventurer');
+  const [budgetStyle, setBudgetStyle] = useState('mid_range');
+  const [travelInterests, setTravelInterests] = useState('beaches, food, hidden gems');
   const [loading, setLoading]   = useState(false);
 
   const handleRegister = async () => {
-    if (!username || !displayName || !email || !password) { Alert.alert('Error', 'Please fill all required fields'); return; }
-    if (password.length < 8) { Alert.alert('Error', 'Password must be at least 8 characters'); return; }
+    if (!username || !displayName || !email || !password || !dateOfBirth) { Alert.alert('Error', 'Please fill all required fields, including date of birth'); return; }
+    if (password.length < 8 || !/[A-Za-z]/.test(password) || !/[0-9]/.test(password)) {
+      Alert.alert('Error', 'Password must be at least 8 characters and include a letter and number');
+      return;
+    }
     setLoading(true);
     
     const userData = {
@@ -26,6 +33,10 @@ export default function RegisterScreen({ navigation }) {
       email: email.trim().toLowerCase(),
       password,
       phoneNumber: phoneNumber.trim() || undefined,
+      dateOfBirth: dateOfBirth.trim(),
+      travelPersonality,
+      budgetStyle,
+      travelInterests: travelInterests.split(',').map((item) => item.trim()).filter(Boolean),
     };
 
     const result = await register(userData);
@@ -55,6 +66,7 @@ export default function RegisterScreen({ navigation }) {
               { icon: 'person-outline', placeholder: 'Display Name', value: displayName, setter: setDisplayName, type: 'default' },
               { icon: 'mail-outline', placeholder: 'Email address', value: email, setter: setEmail, type: 'email-address' },
               { icon: 'call-outline', placeholder: 'Phone Number (optional)', value: phoneNumber, setter: setPhoneNumber, type: 'phone-pad' },
+              { icon: 'calendar-outline', placeholder: 'Date of Birth (YYYY-MM-DD)', value: dateOfBirth, setter: setDateOfBirth, type: 'numbers-and-punctuation' },
               { icon: 'lock-closed-outline', placeholder: 'Password (min 8 chars)', value: password, setter: setPassword, secure: true },
             ].map((f, i) => (
               <View key={i} style={styles.inputWrap}>
@@ -64,6 +76,30 @@ export default function RegisterScreen({ navigation }) {
                   autoCapitalize="none" secureTextEntry={f.secure} />
               </View>
             ))}
+
+            <Text style={styles.fieldLabel}>Travel Personality</Text>
+            <View style={styles.choiceRow}>
+              {['adventurer', 'planner', 'foodie'].map((item) => (
+                <TouchableOpacity key={item} style={[styles.choice, travelPersonality === item && styles.choiceActive]} onPress={() => setTravelPersonality(item)}>
+                  <Text style={[styles.choiceText, travelPersonality === item && styles.choiceTextActive]}>{item.replace('_', ' ')}</Text>
+                </TouchableOpacity>
+              ))}
+            </View>
+
+            <Text style={styles.fieldLabel}>Budget Style</Text>
+            <View style={styles.choiceRow}>
+              {['budget', 'mid_range', 'premium'].map((item) => (
+                <TouchableOpacity key={item} style={[styles.choice, budgetStyle === item && styles.choiceActive]} onPress={() => setBudgetStyle(item)}>
+                  <Text style={[styles.choiceText, budgetStyle === item && styles.choiceTextActive]}>{item.replace('_', ' ')}</Text>
+                </TouchableOpacity>
+              ))}
+            </View>
+
+            <View style={styles.inputWrap}>
+              <Ionicons name="sparkles-outline" size={20} color={COLORS.textSecondary} style={{ marginRight: 10 }} />
+              <TextInput style={styles.input} placeholder="Interests: beaches, cafes, treks" placeholderTextColor={COLORS.textLight}
+                value={travelInterests} onChangeText={setTravelInterests} autoCapitalize="none" />
+            </View>
 
             <TouchableOpacity style={[styles.btn, loading && { opacity: 0.7 }]} onPress={handleRegister} disabled={loading}>
               <LinearGradient colors={[COLORS.primary, COLORS.accent]} style={styles.btnGradient} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }}>
@@ -95,6 +131,12 @@ const styles = StyleSheet.create({
   cardSub: { fontSize: FONTS.sizes.sm, color: COLORS.textSecondary, marginTop: 4, marginBottom: 24 },
   inputWrap: { flexDirection: 'row', alignItems: 'center', backgroundColor: COLORS.background, borderRadius: 12, paddingHorizontal: 14, marginBottom: 14, borderWidth: 1, borderColor: COLORS.border },
   input: { flex: 1, fontSize: FONTS.sizes.md, color: COLORS.textPrimary, paddingVertical: 12 },
+  fieldLabel: { color: COLORS.textSecondary, fontSize: FONTS.sizes.xs, fontWeight: '800', marginBottom: 8, textTransform: 'uppercase' },
+  choiceRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginBottom: 14 },
+  choice: { paddingHorizontal: 12, paddingVertical: 8, borderRadius: 18, borderWidth: 1, borderColor: COLORS.border, backgroundColor: COLORS.background },
+  choiceActive: { backgroundColor: COLORS.primary, borderColor: COLORS.primary },
+  choiceText: { color: COLORS.textSecondary, fontSize: FONTS.sizes.xs, fontWeight: '700', textTransform: 'capitalize' },
+  choiceTextActive: { color: COLORS.white },
   btn: { borderRadius: 14, overflow: 'hidden', marginBottom: 20, marginTop: 6 },
   btnGradient: { justifyContent: 'center', alignItems: 'center', paddingVertical: 15 },
   btnText: { color: COLORS.white, fontSize: FONTS.sizes.base, fontWeight: '700' },

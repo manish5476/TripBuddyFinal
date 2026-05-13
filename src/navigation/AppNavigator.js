@@ -13,6 +13,7 @@ import LoginScreen from '../screens/Auth/LoginScreen';
 import RegisterScreen from '../screens/Auth/RegisterScreen';
 import HomeScreen from '../screens/Home/HomeScreen';
 import CreateJourneyScreen from '../screens/Home/CreateJourneyScreen';
+import ExploreMapScreen from '../screens/Home/ExploreMapScreen';
 import MyJourneysScreen from '../screens/Trip/MyJourneysScreen';
 import JourneyDetailScreen from '../screens/Trip/JourneyDetailScreen';
 import CreateStopScreen from '../screens/Trip/CreateStopScreen';
@@ -107,6 +108,7 @@ export const AppNavigator = () => (
   <Stack.Navigator screenOptions={{ headerShown: false }}>
     <Stack.Screen name="Drawer" component={DrawerNav} />
     <Stack.Screen name="CreateJourney" component={CreateJourneyScreen} />
+    <Stack.Screen name="ExploreMap" component={ExploreMapScreen} />
     <Stack.Screen name="JourneyDetail" component={JourneyDetailScreen} />
     <Stack.Screen name="CreateStop" component={CreateStopScreen} />
     <Stack.Screen name="JourneyTimeline" component={JourneyTimelineScreen} />

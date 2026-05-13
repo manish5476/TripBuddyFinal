@@ -8,7 +8,7 @@ import * as Location from 'expo-location';
 import { LinearGradient } from 'expo-linear-gradient';
 import Header from '../../components/common/Header';
 import { COLORS, FONTS, SHADOWS, SPACING } from '../../constants';
-import { stopService } from '../../services';
+import { postService } from '../../services';
 
 // ── Canonical Transport Modes — MUST match backend TRANSPORT_MODES enum ──
 const MODES = [
@@ -132,12 +132,12 @@ export default function CreateStopScreen() {
         formData.append('media', { uri: imageUri, name: filename, type });
       }
 
-      await stopService.createStop(formData);
-      Alert.alert('Success', 'Stop logged successfully on your journey map!');
+      await postService.createPost(formData);
+      Alert.alert('Success', 'Post logged successfully on your journey map!');
       navigation.goBack();
     } catch (err) {
       console.log('Stop create error:', err);
-      Alert.alert('Error', 'Failed to log the stop. Please try again.');
+      Alert.alert('Error', err.message || 'Failed to log the post. Please try again.');
     } finally {
       setLoading(false);
     }

@@ -6,6 +6,7 @@ import { useNavigation, useRoute } from '@react-navigation/native';
 import { LinearGradient } from 'expo-linear-gradient';
 import moment from 'moment';
 import Header from '../../components/common/Header';
+import LeafletMap from '../../components/map/LeafletMap';
 import { COLORS, FONTS, SHADOWS, SPACING } from '../../constants';
 import { journeyService } from '../../services';
 
@@ -16,6 +17,7 @@ export default function JourneyDetailScreen() {
   const { journeyId } = route.params || {};
 
   const [journey, setJourney] = useState(null);
+  const [mapData, setMapData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [actionLoading, setActionLoading] = useState(false);
   const [showSegmentInput, setShowSegmentInput] = useState(false);
@@ -24,9 +26,13 @@ export default function JourneyDetailScreen() {
   const fetchJourneyDetails = useCallback(async () => {
     if (!journeyId) return;
     try {
-      const res = await journeyService.getJourney(journeyId);
+      const [res, mapRes] = await Promise.all([
+        journeyService.getJourney(journeyId),
+        journeyService.getJourneyMap(journeyId).catch(() => null),
+      ]);
       // Backend returns: { data: { journey, stopCount, liveSession } }
       setJourney(res.data?.journey || res.data || null);
+      setMapData(mapRes?.data || null);
     } catch (err) {
       console.log('Error fetching journey:', err);
       Alert.alert('Error', 'Failed to load journey details.');
@@ -114,6 +120,13 @@ export default function JourneyDetailScreen() {
   );
 
   const isActive = journey.status === 'active';
+  const mapCenter = mapData?.center || coordinateFromGeoPoint(journey.startCoordinates) || { lat: 20.5937, lng: 78.9629 };
+  const mapMarkers = mapData?.markers?.length
+    ? mapData.markers
+    : buildFallbackMarkers(journey);
+  const mapRoute = mapData?.routeCoordinates?.length
+    ? mapData.routeCoordinates
+    : mapMarkers.map(({ lat, lng }) => ({ lat, lng }));
 
   return (
     <View style={styles.container}>
@@ -122,13 +135,22 @@ export default function JourneyDetailScreen() {
         
         {/* Mock Map Header */}
         <View style={styles.mapArea}>
-          <LinearGradient colors={['rgba(59, 130, 246, 0.1)', 'rgba(59, 130, 246, 0.3)']} style={styles.mapGradient}>
+          <LeafletMap
+            latitude={mapCenter.lat}
+            longitude={mapCenter.lng}
+            zoom={mapMarkers.length > 1 ? 10 : 12}
+            markers={mapMarkers}
+            routeCoordinates={mapRoute}
+            height={260}
+            fitToMarkers
+          />
+          {false && <LinearGradient colors={['rgba(59, 130, 246, 0.1)', 'rgba(59, 130, 246, 0.3)']} style={styles.mapGradient}>
             <Ionicons name="map" size={80} color="rgba(59, 130, 246, 0.4)" />
             <View style={styles.mapPin}>
                <Text style={styles.emojiPin}>{journey.emoji || '📍'}</Text>
             </View>
             <View style={styles.trajectory} />
-          </LinearGradient>
+          </LinearGradient>}
           
           <View style={styles.mapOverlayInfo}>
             <View style={styles.statusBadge}>
@@ -260,6 +282,40 @@ export default function JourneyDetailScreen() {
       </ScrollView>
     </View>
   );
+}
+
+function coordinateFromGeoPoint(geoPoint) {
+  const coordinates = geoPoint?.coordinates;
+  if (!Array.isArray(coordinates) || coordinates.length < 2) return null;
+  const lng = Number(coordinates[0]);
+  const lat = Number(coordinates[1]);
+  if (!Number.isFinite(lat) || !Number.isFinite(lng)) return null;
+  return { lat, lng };
+}
+
+function buildFallbackMarkers(journey) {
+  const markers = [];
+  const start = coordinateFromGeoPoint(journey.startCoordinates);
+  if (start) {
+    markers.push({
+      ...start,
+      kind: 'start',
+      title: journey.startLocationName || 'Journey start',
+      description: 'Starting point',
+    });
+  }
+
+  const end = coordinateFromGeoPoint(journey.endCoordinates);
+  if (end) {
+    markers.push({
+      ...end,
+      kind: 'end',
+      title: journey.endLocationName || 'Destination',
+      description: journey.status === 'completed' ? 'Journey completed' : 'Planned destination',
+    });
+  }
+
+  return markers;
 }
 
 const styles = StyleSheet.create({

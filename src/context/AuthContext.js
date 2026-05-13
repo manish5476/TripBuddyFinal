@@ -20,8 +20,15 @@ export const AuthProvider = ({ children }) => {
       const storedUser = await AsyncStorage.getItem('user');
       if (storedToken && storedUser) {
         setToken(storedToken);
-        setUser(JSON.parse(storedUser));
+        const cachedUser = JSON.parse(storedUser);
+        setUser(cachedUser);
         socketService.connect(storedToken);
+        authService.getMe()
+          .then(async (res) => {
+            await AsyncStorage.setItem('user', JSON.stringify(res.data));
+            setUser(res.data);
+          })
+          .catch(() => {});
       }
     } catch (e) {
       console.log('Session restore error:', e);
@@ -51,6 +58,14 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
+  const refreshMe = async () => {
+    const res = await authService.getMe();
+    const freshUser = res.data;
+    await AsyncStorage.setItem('user', JSON.stringify(freshUser));
+    setUser(freshUser);
+    return freshUser;
+  };
+
   const register = async (userData) => {
     try {
       const res = await authService.register(userData);
@@ -71,6 +86,29 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
+  const completeOnboarding = async (data) => {
+    try {
+      if (data.dateOfBirth) {
+        await authService.updateProfile({ dateOfBirth: data.dateOfBirth });
+      }
+      const res = await authService.completeOnboarding(data);
+      const updatedUser = {
+        ...user,
+        ...res.data,
+        requiresOnboarding: false,
+        requiresAgeVerification: false,
+      };
+      await AsyncStorage.setItem('user', JSON.stringify(updatedUser));
+      setUser(updatedUser);
+      return { success: true };
+    } catch (e) {
+      return {
+        success: false,
+        message: e.message || e.error || 'Onboarding failed'
+      };
+    }
+  };
+
   const logout = async () => {
     try { await authService.logout(); } catch (_) { }
     await AsyncStorage.multiRemove(['token', 'user']);
@@ -86,7 +124,7 @@ export const AuthProvider = ({ children }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ user, token, loading, login, register, logout, updateUser }}>
+    <AuthContext.Provider value={{ user, token, loading, login, register, logout, updateUser, refreshMe, completeOnboarding }}>
       {children}
     </AuthContext.Provider>
   );

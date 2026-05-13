@@ -2,6 +2,7 @@ export { authService } from './api/auth.service';
 export { userService } from './api/user.service';
 export { journeyService } from './api/journey.service';
 export { stopService } from './api/stop.service';
+export { postService } from './api/post.service';
 export { reelService } from './api/reel.service';
 export { channelService } from './api/channel.service';
 export { messageService } from './api/message.service';

@@ -6,6 +6,7 @@ export const authService = {
   login: (email, password) => baseService.post(ENDPOINTS.AUTH.LOGIN, { email, password }),
   logout: () => baseService.post(ENDPOINTS.AUTH.LOGOUT),
   getMe: () => baseService.get(ENDPOINTS.AUTH.ME),
+  completeOnboarding: (data) => baseService.put(ENDPOINTS.AUTH.ONBOARDING, data),
   updateProfile: (data) => baseService.put(ENDPOINTS.AUTH.UPDATE_PROFILE, data),
   updatePassword: (data) => baseService.put(ENDPOINTS.AUTH.UPDATE_PASSWORD, data),
   uploadUserAvatar: (data) => baseService.post(ENDPOINTS.AUTH.AVATAR, data, { headers: { 'Content-Type': 'multipart/form-data' } }),

@@ -95,7 +95,7 @@ export default function CreateJourneyScreen({ navigation }) {
         { text: 'Awesome', onPress: () => navigation.goBack() },
       ]);
     } catch (e) {
-      Alert.alert('Error', e.response?.data?.message || 'Failed to start journey.');
+      Alert.alert('Error', e.message || 'Failed to start journey.');
     } finally {
       setLoading(false);
     }
