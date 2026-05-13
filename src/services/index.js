@@ -13,6 +13,7 @@ export { exploreService } from './api/explore.service';
 export { notificationService } from './api/notification.service';
 export { expenseService } from './api/expense.service';
 export { templateService } from './api/template.service';
+export { tripService } from './api/trip.service';
 export { uploadService } from './api/upload.service';
 
 export { default as apiClient } from './apiClient';

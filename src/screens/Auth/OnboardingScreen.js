@@ -1,8 +1,9 @@
 // src/screens/Auth/OnboardingScreen.js
 import React, { useState } from 'react';
-import { Alert, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { Alert, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View, Platform } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
+import DateTimePicker from '@react-native-community/datetimepicker';
 import { useAuth } from '../../context/AuthContext';
 import { COLORS, FONTS } from '../../constants';
 
@@ -31,11 +32,13 @@ export default function OnboardingScreen() {
   const [interests, setInterests] = useState('beaches, food, hidden gems');
   const [loading, setLoading] = useState(false);
 
+  const [showDatePicker, setShowDatePicker] = useState(false);
+
   const handleContinue = async () => {
     setLoading(true);
     if (user?.requiresAgeVerification) {
       if (!dateOfBirth.trim()) {
-        Alert.alert('Age required', 'Please enter your date of birth as YYYY-MM-DD.');
+        Alert.alert('Age required', 'Please enter your date of birth.');
         setLoading(false);
         return;
       }
@@ -50,6 +53,13 @@ export default function OnboardingScreen() {
     });
     setLoading(false);
     if (!result.success) Alert.alert('Setup failed', result.message);
+  };
+
+  const onDateChange = (event, selectedDate) => {
+    setShowDatePicker(Platform.OS === 'ios');
+    if (selectedDate) {
+      setDateOfBirth(selectedDate.toISOString().split('T')[0]);
+    }
   };
 
   return (
@@ -95,17 +105,25 @@ export default function OnboardingScreen() {
           {user?.requiresAgeVerification && (
             <>
               <Text style={styles.label}>Date of birth</Text>
-              <View style={styles.inputWrap}>
+              <TouchableOpacity 
+                style={styles.inputWrap} 
+                onPress={() => setShowDatePicker(true)}
+                activeOpacity={0.7}
+              >
                 <Ionicons name="calendar-outline" size={18} color={COLORS.textSecondary} style={styles.inputIcon} />
-                <TextInput
-                  style={styles.input}
-                  placeholder="YYYY-MM-DD"
-                  placeholderTextColor={COLORS.textLight}
-                  value={dateOfBirth}
-                  onChangeText={setDateOfBirth}
-                  keyboardType="numbers-and-punctuation"
+                <Text style={[styles.input, !dateOfBirth && { color: COLORS.textLight }]}>
+                  {dateOfBirth || 'YYYY-MM-DD'}
+                </Text>
+              </TouchableOpacity>
+              {showDatePicker && (
+                <DateTimePicker
+                  value={dateOfBirth ? new Date(dateOfBirth) : new Date()}
+                  mode="date"
+                  display="default"
+                  onChange={onDateChange}
+                  maximumDate={new Date()}
                 />
-              </View>
+              )}
             </>
           )}
 

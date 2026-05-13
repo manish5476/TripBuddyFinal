@@ -15,6 +15,8 @@ export const API_CONFIG = {
   TIMEOUT:    10000,
 };
 
+console.log('[API_CONFIG] Loading with BASE_URL:', API_CONFIG.BASE_URL);
+
 // ── API Endpoints ───────────────────────────────
 export const ENDPOINTS = {
   AUTH: {
@@ -38,6 +40,14 @@ export const ENDPOINTS = {
     FOLLOWERS:       (userId) => `/users/${userId}/followers`,
     FOLLOWING:       (userId) => `/users/${userId}/following`,
     BLOCK:           (userId) => `/users/${userId}/block`,
+  },
+  TRIPS: {
+    ALL:             '/travel-groups',
+    MY:              '/travel-groups',
+    CREATE:          '/travel-groups',
+    DETAIL:          (id) => `/travel-groups/${id}`,
+    UPDATE:          (id) => `/travel-groups/${id}`,
+    DELETE:          (id) => `/travel-groups/${id}`,
   },
   JOURNEYS: {
     ALL:             '/journeys',

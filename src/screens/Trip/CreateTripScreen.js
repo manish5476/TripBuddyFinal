@@ -1,7 +1,8 @@
 // src/screens/Trip/CreateTripScreen.js
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, TextInput, TouchableOpacity, Alert, ActivityIndicator } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TextInput, TouchableOpacity, Alert, ActivityIndicator, Platform } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import DateTimePicker from '@react-native-community/datetimepicker';
 import Header from '../../components/common/Header';
 import { COLORS, FONTS } from '../../constants';
 import { tripService } from '../../services';
@@ -18,6 +19,10 @@ export default function CreateTripScreen({ navigation, route }) {
   const [tripType, setTripType]       = useState('');
   const [description, setDescription] = useState('');
   const [loading, setLoading]         = useState(false);
+
+  // Picker States
+  const [showStartPicker, setShowStartPicker] = useState(false);
+  const [showEndPicker, setShowEndPicker] = useState(false);
 
   const handleCreate = async () => {
     if (!destination || !startDate || !endDate || !budget) {
@@ -45,6 +50,20 @@ export default function CreateTripScreen({ navigation, route }) {
     }
   };
 
+  const onDateChange = (event, selectedDate, type) => {
+    if (type === 'start') {
+      setShowStartPicker(Platform.OS === 'ios');
+      if (selectedDate) {
+        setStartDate(selectedDate.toISOString().split('T')[0]);
+      }
+    } else {
+      setShowEndPicker(Platform.OS === 'ios');
+      if (selectedDate) {
+        setEndDate(selectedDate.toISOString().split('T')[0]);
+      }
+    }
+  };
+
   return (
     <View style={{ flex: 1, backgroundColor: COLORS.background }}>
       <Header title="Create Trip" onBackPress={() => navigation.goBack()} />
@@ -60,20 +79,40 @@ export default function CreateTripScreen({ navigation, route }) {
         <View style={styles.row}>
           <View style={{ flex: 1 }}>
             <Text style={styles.label}>Start Date *</Text>
-            <View style={styles.inputWrap}>
+            <TouchableOpacity style={styles.inputWrap} onPress={() => setShowStartPicker(true)} activeOpacity={0.7}>
               <Ionicons name="calendar-outline" size={18} color={COLORS.textSecondary} style={styles.icon} />
-              <TextInput style={styles.input} placeholder="YYYY-MM-DD" placeholderTextColor={COLORS.textLight}
-                value={startDate} onChangeText={setStartDate} />
-            </View>
+              <Text style={[styles.input, !startDate && { color: COLORS.textLight }]}>
+                {startDate || 'YYYY-MM-DD'}
+              </Text>
+            </TouchableOpacity>
+            {showStartPicker && (
+              <DateTimePicker
+                value={startDate ? new Date(startDate) : new Date()}
+                mode="date"
+                display="default"
+                onChange={(e, d) => onDateChange(e, d, 'start')}
+                minimumDate={new Date()}
+              />
+            )}
           </View>
           <View style={{ width: 12 }} />
           <View style={{ flex: 1 }}>
             <Text style={styles.label}>End Date *</Text>
-            <View style={styles.inputWrap}>
+            <TouchableOpacity style={styles.inputWrap} onPress={() => setShowEndPicker(true)} activeOpacity={0.7}>
               <Ionicons name="calendar-outline" size={18} color={COLORS.textSecondary} style={styles.icon} />
-              <TextInput style={styles.input} placeholder="YYYY-MM-DD" placeholderTextColor={COLORS.textLight}
-                value={endDate} onChangeText={setEndDate} />
-            </View>
+              <Text style={[styles.input, !endDate && { color: COLORS.textLight }]}>
+                {endDate || 'YYYY-MM-DD'}
+              </Text>
+            </TouchableOpacity>
+            {showEndPicker && (
+              <DateTimePicker
+                value={endDate ? new Date(endDate) : (startDate ? new Date(startDate) : new Date())}
+                mode="date"
+                display="default"
+                onChange={(e, d) => onDateChange(e, d, 'end')}
+                minimumDate={startDate ? new Date(startDate) : new Date()}
+              />
+            )}
           </View>
         </View>
 

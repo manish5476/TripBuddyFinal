@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView, Alert, KeyboardAvoidingView, Platform } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
+import DateTimePicker from '@react-native-community/datetimepicker';
 import { useAuth } from '../../context/AuthContext';
 import { COLORS, FONTS } from '../../constants';
 
@@ -18,6 +19,8 @@ export default function RegisterScreen({ navigation }) {
   const [budgetStyle, setBudgetStyle] = useState('mid_range');
   const [travelInterests, setTravelInterests] = useState('beaches, food, hidden gems');
   const [loading, setLoading]   = useState(false);
+
+  const [showDatePicker, setShowDatePicker] = useState(false);
 
   const handleRegister = async () => {
     if (!username || !displayName || !email || !password || !dateOfBirth) { Alert.alert('Error', 'Please fill all required fields, including date of birth'); return; }
@@ -44,6 +47,13 @@ export default function RegisterScreen({ navigation }) {
     if (!result.success) Alert.alert('Registration Failed', result.message);
   };
 
+  const onDateChange = (event, selectedDate) => {
+    setShowDatePicker(Platform.OS === 'ios');
+    if (selectedDate) {
+      setDateOfBirth(selectedDate.toISOString().split('T')[0]);
+    }
+  };
+
   return (
     <LinearGradient colors={[COLORS.primary, '#0a1628']} style={{ flex: 1 }}>
       <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={{ flex: 1 }}>
@@ -66,14 +76,35 @@ export default function RegisterScreen({ navigation }) {
               { icon: 'person-outline', placeholder: 'Display Name', value: displayName, setter: setDisplayName, type: 'default' },
               { icon: 'mail-outline', placeholder: 'Email address', value: email, setter: setEmail, type: 'email-address' },
               { icon: 'call-outline', placeholder: 'Phone Number (optional)', value: phoneNumber, setter: setPhoneNumber, type: 'phone-pad' },
-              { icon: 'calendar-outline', placeholder: 'Date of Birth (YYYY-MM-DD)', value: dateOfBirth, setter: setDateOfBirth, type: 'numbers-and-punctuation' },
+              { icon: 'calendar-outline', placeholder: 'Date of Birth (YYYY-MM-DD)', value: dateOfBirth, setter: setDateOfBirth, isDate: true },
               { icon: 'lock-closed-outline', placeholder: 'Password (min 8 chars)', value: password, setter: setPassword, secure: true },
             ].map((f, i) => (
-              <View key={i} style={styles.inputWrap}>
-                <Ionicons name={f.icon} size={20} color={COLORS.textSecondary} style={{ marginRight: 10 }} />
-                <TextInput style={styles.input} placeholder={f.placeholder} placeholderTextColor={COLORS.textLight}
-                  value={f.value} onChangeText={f.setter} keyboardType={f.type || 'default'}
-                  autoCapitalize="none" secureTextEntry={f.secure} />
+              <View key={i}>
+                <TouchableOpacity 
+                  disabled={!f.isDate}
+                  onPress={() => f.isDate && setShowDatePicker(true)}
+                  style={styles.inputWrap}
+                >
+                  <Ionicons name={f.icon} size={20} color={COLORS.textSecondary} style={{ marginRight: 10 }} />
+                  {f.isDate ? (
+                    <Text style={[styles.input, !f.value && { color: COLORS.textLight }]}>
+                      {f.value || f.placeholder}
+                    </Text>
+                  ) : (
+                    <TextInput style={styles.input} placeholder={f.placeholder} placeholderTextColor={COLORS.textLight}
+                      value={f.value} onChangeText={f.setter} keyboardType={f.type || 'default'}
+                      autoCapitalize="none" secureTextEntry={f.secure} />
+                  )}
+                </TouchableOpacity>
+                {f.isDate && showDatePicker && (
+                  <DateTimePicker
+                    value={dateOfBirth ? new Date(dateOfBirth) : new Date()}
+                    mode="date"
+                    display="default"
+                    onChange={onDateChange}
+                    maximumDate={new Date()}
+                  />
+                )}
               </View>
             ))}
 
